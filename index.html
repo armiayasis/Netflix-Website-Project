@@ -51,9 +51,90 @@
                     <a href="#music" class="nav-link">Music Library</a>
                     <a href="#news" class="nav-link">Balita</a>
                     <a href="#contact" class="nav-link">Contact</a>
+                    <button class="menu-dots-btn" id="menuDotsBtn">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <circle cx="12" cy="5" r="2"/>
+                            <circle cx="12" cy="12" r="2"/>
+                            <circle cx="12" cy="19" r="2"/>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <button class="dropdown-item" id="adminLoginBtn">🔐 Admin Access</button>
+                        <button class="dropdown-item" id="logoutBtn" style="display: none;">🚪 Logout</button>
+                    </div>
                 </nav>
             </div>
         </header>
+
+        <div class="ads-container">
+            <div class="ad-banner ad-shopee">
+                <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=100&fit=crop" alt="Shopee Ad">
+                <div class="ad-content">
+                    <h4>🛍️ Shopee Sale!</h4>
+                    <p>Up to 50% OFF on Beauty Products</p>
+                </div>
+            </div>
+            <div class="ad-banner ad-lazada">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=100&fit=crop" alt="Lazada Ad">
+                <div class="ad-content">
+                    <h4>🎁 Lazada Deals!</h4>
+                    <p>Flash Sale - Limited Time Only</p>
+                </div>
+            </div>
+            <div class="ad-banner ad-promo">
+                <img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=400&h=100&fit=crop" alt="Promo Ad">
+                <div class="ad-content">
+                    <h4>✨ Special Promo!</h4>
+                    <p>Get FREE Shipping Today</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="adminLoginModal">
+            <div class="modal-content">
+                <span class="modal-close" id="closeLoginModal">&times;</span>
+                <h2>🔐 Admin Access</h2>
+                <p>Human Verification Required</p>
+                <form id="adminLoginForm">
+                    <input type="text" id="adminUsername" placeholder="Admin Username" required>
+                    <input type="password" id="adminPassword" placeholder="Password" required>
+                    <div class="verification-box">
+                        <label>
+                            <input type="checkbox" id="humanVerify" required>
+                            I am a human (not a robot)
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal" id="adminDashboard">
+            <div class="modal-content admin-dashboard-content">
+                <span class="modal-close" id="closeDashboard">&times;</span>
+                <h2>📊 Admin Dashboard</h2>
+                <div class="dashboard-section">
+                    <h3>Post Your Content</h3>
+                    <form id="adminPostForm">
+                        <input type="text" id="postTitle" placeholder="News Title" required>
+                        <textarea id="postText" placeholder="Write your news content..." rows="5" required></textarea>
+                        <div class="file-upload-box">
+                            <label for="postImage" class="file-upload-label">
+                                📸 Upload Picture
+                                <input type="file" id="postImage" accept="image/*">
+                            </label>
+                            <span id="fileName">No file chosen</span>
+                        </div>
+                        <div id="imagePreview"></div>
+                        <button type="submit" class="btn-primary">Publish Post</button>
+                    </form>
+                </div>
+                <div class="dashboard-section">
+                    <h3>Your Posts</h3>
+                    <div id="adminPostsList"></div>
+                </div>
+            </div>
+        </div>
 
         <section id="home" class="hero">
             <div class="container">
