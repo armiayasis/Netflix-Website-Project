@@ -3,367 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRIGADA NEWS FM - Your Trusted News Radio</title>
+    <title>BRIGADA NEWS FM - Radio Stations & Music Library</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo-section">
-                <div class="logo">
-                    <div class="radio-icon">📻</div>
-                    <div class="logo-text">
-                        <h1>BRIGADA NEWS FM</h1>
-                        <p class="tagline">Ang Tinig ng Bayan</p>
-                    </div>
-                </div>
+    <div id="landingPage" class="landing-page active">
+        <div class="landing-content">
+            <div class="landing-loader">
+                <div class="radio-wave"></div>
+                <div class="radio-wave"></div>
+                <div class="radio-wave"></div>
             </div>
-            <nav class="nav">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#news" class="nav-link">Balita</a>
-                <a href="#schedule" class="nav-link">Schedule</a>
-                <a href="#about" class="nav-link">About</a>
-                <a href="#contact" class="nav-link">Contact</a>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Hero Section with Live Player -->
-    <section id="home" class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="live-badge">
-                    <span class="pulse"></span>
-                    LIVE NOW
-                </div>
-                <h2 class="hero-title">BRIGADA NEWS FM</h2>
-                <p class="hero-subtitle">Balita, Komento, at Impormasyon</p>
-                <p class="hero-description">Ang inyong pinagkakatiwalaang istasyon para sa pinakabagong balita, ulat, at impormasyon. Makinig ng LIVE 24/7!</p>
-                
-                <div class="cta-buttons">
-                    <button class="get-started-btn" id="getStartedBtn">
-                        <span>GET STARTED</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </button>
-                    <button class="learn-more-btn" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
-                        Learn More
-                    </button>
-                </div>
-                
-                <!-- Radio Player -->
-                <div class="radio-player">
-                    <div class="player-info">
-                        <div class="now-playing">
-                            <span class="label">Now Playing:</span>
-                            <span class="program-name" id="currentProgram">Brigada Balita</span>
-                        </div>
-                        <div class="host-info">
-                            <span class="label">Host:</span>
-                            <span class="host-name" id="currentHost">DJ Mike Santos</span>
-                        </div>
-                    </div>
-                    
-                    <div class="player-controls">
-                        <button class="play-btn" id="playBtn">
-                            <svg class="play-icon" viewBox="0 0 24 24" width="40" height="40">
-                                <path fill="currentColor" d="M8 5v14l11-7z"/>
-                            </svg>
-                            <svg class="pause-icon" viewBox="0 0 24 24" width="40" height="40" style="display: none;">
-                                <path fill="currentColor" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
-                            </svg>
-                        </button>
-                        <div class="volume-control">
-                            <svg viewBox="0 0 24 24" width="24" height="24">
-                                <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-                            </svg>
-                            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
-                        </div>
-                    </div>
-                    
-                    <div class="frequency-display">
-                        <div class="frequency">FM 99.5</div>
-                        <div class="listeners">
-                            <svg viewBox="0 0 24 24" width="16" height="16">
-                                <path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-                            </svg>
-                            <span id="listenerCount">1,245</span> listening
-                        </div>
-                    </div>
-                    
-                    <!-- Hidden Audio Element -->
-                    <audio id="radioStream" preload="none">
-                        <source src="https://streams.radio.co/s83e4c7d3d/listen" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
+            <h1 class="landing-title">🎙️ BRIGADA NEWS FM</h1>
+            <p class="landing-subtitle">Ang Tinig ng Bayan</p>
+            <p class="landing-description">Radio Stations at Music Library sa Buong Pilipinas</p>
+            <button class="get-started-btn-landing" id="getStartedLanding">
+                <span>GET STARTED</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loadingProgress"></div>
             </div>
-        </div>
-    </section>
-
-    <!-- Breaking News Ticker -->
-    <div class="news-ticker">
-        <div class="ticker-label">BREAKING NEWS:</div>
-        <div class="ticker-content">
-            <span id="tickerText">Welcome to Brigada News FM - Your trusted source for news and information</span>
+            <p class="loading-text" id="loadingText">Naghihintay...</p>
         </div>
     </div>
 
-    <!-- Latest News Section -->
-    <section id="news" class="news-section">
-        <div class="container">
-            <h2 class="section-title">Pinakabagong Balita</h2>
-            
-            <div class="news-grid">
-                <article class="news-card featured">
-                    <div class="news-badge">BREAKING</div>
-                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=500&fit=crop" alt="News" class="news-image">
-                    <div class="news-content">
-                        <span class="news-category">Politics</span>
-                        <h3 class="news-title">Mahalagang Anunsyo mula sa Pamahalaan</h3>
-                        <p class="news-excerpt">Inanunsyo ng pamahalaan ang mga bagong patakaran para sa ekonomiya at trabaho...</p>
-                        <div class="news-meta">
-                            <span class="news-time">30 mins ago</span>
-                            <span class="news-author">By: Maria Cruz</span>
+    <div id="mainApp" class="main-app">
+        <header class="header">
+            <div class="container">
+                <div class="logo-section">
+                    <div class="logo">
+                        <div class="radio-icon">📻</div>
+                        <div class="logo-text">
+                            <h1>BRIGADA NEWS FM</h1>
+                            <p class="tagline">Ang Tinig ng Bayan</p>
                         </div>
                     </div>
-                </article>
-
-                <article class="news-card">
-                    <img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&h=400&fit=crop" alt="News" class="news-image">
-                    <div class="news-content">
-                        <span class="news-category">Health</span>
-                        <h3 class="news-title">Bagong Health Protocol Ipinatutupad</h3>
-                        <p class="news-excerpt">Ang Department of Health ay naglabas ng bagong health advisories...</p>
-                        <div class="news-meta">
-                            <span class="news-time">1 hour ago</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="news-card">
-                    <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&h=400&fit=crop" alt="News" class="news-image">
-                    <div class="news-content">
-                        <span class="news-category">Weather</span>
-                        <h3 class="news-title">Panahon Update: Ulan Inaasahan</h3>
-                        <p class="news-excerpt">Ayon sa PAGASA, inaasahang umulan sa susunod na mga araw...</p>
-                        <div class="news-meta">
-                            <span class="news-time">2 hours ago</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="news-card">
-                    <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&h=400&fit=crop" alt="News" class="news-image">
-                    <div class="news-content">
-                        <span class="news-category">Sports</span>
-                        <h3 class="news-title">Local Basketball Team Nanalo</h3>
-                        <p class="news-excerpt">Nagwagi ang ating local basketball team sa championship game...</p>
-                        <div class="news-meta">
-                            <span class="news-time">3 hours ago</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="news-card">
-                    <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=600&h=400&fit=crop" alt="News" class="news-image">
-                    <div class="news-content">
-                        <span class="news-category">Business</span>
-                        <h3 class="news-title">Ekonomiya: Mga Update sa Negosyo</h3>
-                        <p class="news-excerpt">Tumaas ang stock market ngayong linggo, ayon sa mga analyst...</p>
-                        <div class="news-meta">
-                            <span class="news-time">4 hours ago</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="news-card">
-                    <img src="https://images.unsplash.com/photo-1427751840561-9852520f8ce8?w=600&h=400&fit=crop" alt="News" class="news-image">
-                    <div class="news-content">
-                        <span class="news-category">Education</span>
-                        <h3 class="news-title">Bagong School Year Preparations</h3>
-                        <p class="news-excerpt">Naghahanda na ang mga paaralan para sa bagong school year...</p>
-                        <div class="news-meta">
-                            <span class="news-time">5 hours ago</span>
-                        </div>
-                    </div>
-                </article>
+                </div>
+                <nav class="nav">
+                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="#stations" class="nav-link">Radio Stations</a>
+                    <a href="#music" class="nav-link">Music Library</a>
+                    <a href="#news" class="nav-link">Balita</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </nav>
             </div>
-        </div>
-    </section>
+        </header>
 
-    <!-- Schedule Section -->
-    <section id="schedule" class="schedule-section">
-        <div class="container">
-            <h2 class="section-title">Program Schedule</h2>
-            
-            <div class="schedule-grid">
-                <div class="schedule-card">
-                    <div class="schedule-time">6:00 AM - 9:00 AM</div>
-                    <h3 class="schedule-title">Brigada Umaga</h3>
-                    <p class="schedule-host">with DJ Mike Santos</p>
-                    <p class="schedule-desc">Morning news, weather, and traffic updates</p>
-                </div>
-
-                <div class="schedule-card active">
-                    <div class="schedule-time">9:00 AM - 12:00 PM</div>
-                    <h3 class="schedule-title">Brigada Balita</h3>
-                    <p class="schedule-host">with Maria Cruz</p>
-                    <p class="schedule-desc">Latest news and current affairs</p>
-                </div>
-
-                <div class="schedule-card">
-                    <div class="schedule-time">12:00 PM - 3:00 PM</div>
-                    <h3 class="schedule-title">Tanghali Patrol</h3>
-                    <p class="schedule-host">with Jun Reyes</p>
-                    <p class="schedule-desc">Midday news and community updates</p>
-                </div>
-
-                <div class="schedule-card">
-                    <div class="schedule-time">3:00 PM - 6:00 PM</div>
-                    <h3 class="schedule-title">Hapon Express</h3>
-                    <p class="schedule-host">with Sarah Gonzales</p>
-                    <p class="schedule-desc">Afternoon drive-time news and entertainment</p>
-                </div>
-
-                <div class="schedule-card">
-                    <div class="schedule-time">6:00 PM - 9:00 PM</div>
-                    <h3 class="schedule-title">Gabi ng Balita</h3>
-                    <p class="schedule-host">with Tony Villanueva</p>
-                    <p class="schedule-desc">Evening news roundup and analysis</p>
-                </div>
-
-                <div class="schedule-card">
-                    <div class="schedule-time">9:00 PM - 12:00 AM</div>
-                    <h3 class="schedule-title">Nightcap News</h3>
-                    <p class="schedule-host">with DJ Mica</p>
-                    <p class="schedule-desc">Late night news and relaxing music</p>
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="live-badge">
+                        <span class="pulse"></span>
+                        LIVE NOW
+                    </div>
+                    <h2 class="hero-title">BRIGADA NEWS FM</h2>
+                    <p class="hero-subtitle">Balita, Musika, at Impormasyon</p>
+                    <p class="hero-description">Makinig sa aming mga radio stations sa buong Pilipinas at mag-enjoy ng aming music library!</p>
+                    
+                    <div class="radio-player">
+                        <div class="player-info">
+                            <div class="now-playing">
+                                <span class="label">Now Playing:</span>
+                                <span class="program-name" id="currentProgram">Brigada Balita</span>
+                            </div>
+                            <div class="host-info">
+                                <span class="label">Station:</span>
+                                <span class="host-name" id="currentStation">Manila FM 99.5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="player-controls">
+                            <button class="play-btn" id="playBtn">
+                                <svg class="play-icon" viewBox="0 0 24 24" width="40" height="40">
+                                    <path fill="currentColor" d="M8 5v14l11-7z"/>
+                                </svg>
+                                <svg class="pause-icon" viewBox="0 0 24 24" width="40" height="40" style="display: none;">
+                                    <path fill="currentColor" d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                                </svg>
+                            </button>
+                            <div class="volume-control">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                                </svg>
+                                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+                            </div>
+                        </div>
+                        
+                        <div class="frequency-display">
+                            <div class="frequency" id="currentFrequency">FM 99.5</div>
+                            <div class="listeners">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                                </svg>
+                                <span id="listenerCount">1,245</span> listening
+                            </div>
+                        </div>
+                        
+                        <audio id="radioStream" preload="none">
+                            <source src="https://streams.radio.co/s83e4c7d3d/listen" type="audio/mpeg">
+                        </audio>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- About Section -->
-    <section id="about" class="about-section">
-        <div class="container">
-            <h2 class="section-title">About Brigada News FM</h2>
-            <div class="about-content">
-                <p>Brigada News FM ay inyong pinagkakatiwalaang istasyon ng radyo para sa balita at impormasyon. Kami ay nakatuon sa paghahatid ng tumpak, mabilis, at kapaki-pakinabang na balita sa ating mga kababayan.</p>
-                <p>Sa loob ng maraming taon, kami ay naging bahagi ng inyong pang-araw-araw na buhay, nagbibigay ng mga update sa politika, ekonomiya, kalusugan, panahon, at marami pang iba.</p>
+        <section id="stations" class="stations-section">
+            <div class="container">
+                <h2 class="section-title">📻 Radio Stations sa Buong Pilipinas</h2>
+                <p class="section-subtitle">Pumili ng inyong paboritong istasyon mula sa iba't ibang lugar</p>
                 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">24/7</div>
-                        <div class="stat-label">Live Broadcast</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">1M+</div>
-                        <div class="stat-label">Daily Listeners</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">15+</div>
-                        <div class="stat-label">Years on Air</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">50+</div>
-                        <div class="stat-label">Expert Journalists</div>
-                    </div>
+                <div class="stations-grid" id="stationsGrid"></div>
+            </div>
+        </section>
+
+        <section id="music" class="music-section">
+            <div class="container">
+                <h2 class="section-title">🎵 Music Library - Love Songs Collection</h2>
+                
+                <div class="music-search">
+                    <input type="text" id="searchInput" placeholder="Search music..." class="search-input">
+                    <button id="searchBtn" class="search-btn">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                        SEARCH MUSIC AND PLAY
+                    </button>
+                </div>
+                
+                <div class="music-grid" id="musicGrid"></div>
+            </div>
+        </section>
+
+        <section id="news" class="news-section">
+            <div class="container">
+                <h2 class="section-title">Pinakabagong Balita</h2>
+                
+                <div class="news-grid">
+                    <article class="news-card featured">
+                        <div class="news-badge">BREAKING</div>
+                        <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&h=500&fit=crop" alt="News" class="news-image">
+                        <div class="news-content">
+                            <span class="news-category">Politics</span>
+                            <h3 class="news-title">Mahalagang Anunsyo mula sa Pamahalaan</h3>
+                            <p class="news-excerpt">Inanunsyo ng pamahalaan ang mga bagong patakaran para sa ekonomiya at trabaho...</p>
+                            <div class="news-meta">
+                                <span class="news-time">30 mins ago</span>
+                                <span class="news-author">By: Maria Cruz</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&h=400&fit=crop" alt="News" class="news-image">
+                        <div class="news-content">
+                            <span class="news-category">Health</span>
+                            <h3 class="news-title">Bagong Health Protocol Ipinatutupad</h3>
+                            <p class="news-excerpt">Ang Department of Health ay naglabas ng bagong health advisories...</p>
+                            <div class="news-meta">
+                                <span class="news-time">1 hour ago</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="news-card">
+                        <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&h=400&fit=crop" alt="News" class="news-image">
+                        <div class="news-content">
+                            <span class="news-category">Weather</span>
+                            <h3 class="news-title">Panahon Update: Ulan Inaasahan</h3>
+                            <p class="news-excerpt">Ayon sa PAGASA, inaasahang umulan sa susunod na mga araw...</p>
+                            <div class="news-meta">
+                                <span class="news-time">2 hours ago</span>
+                            </div>
+                        </div>
+                    </article>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact-section">
-        <div class="container">
-            <h2 class="section-title">Makipag-ugnayan sa Amin</h2>
-            
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <div class="contact-icon">📞</div>
-                        <div>
-                            <h4>Hotline</h4>
-                            <p>(02) 8888-9955</p>
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <h2 class="section-title">Makipag-ugnayan sa Amin</h2>
+                
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <div class="contact-icon">📞</div>
+                            <div>
+                                <h4>Hotline</h4>
+                                <p>(02) 8888-9955</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">📧</div>
+                            <div>
+                                <h4>Email</h4>
+                                <p>news@brigadafm.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">📍</div>
+                            <div>
+                                <h4>Address</h4>
+                                <p>Broadcast Center, Manila, Philippines</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="contact-item">
-                        <div class="contact-icon">📧</div>
-                        <div>
-                            <h4>Email</h4>
-                            <p>news@brigadafm.com</p>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon">📍</div>
-                        <div>
-                            <h4>Address</h4>
-                            <p>Broadcast Center, Manila, Philippines</p>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon">📻</div>
-                        <div>
-                            <h4>Frequency</h4>
-                            <p>FM 99.5</p>
-                        </div>
-                    </div>
-                </div>
-
-                <form class="contact-form" id="contactForm">
-                    <input type="text" placeholder="Iyong Pangalan" required>
-                    <input type="email" placeholder="Email Address" required>
-                    <input type="tel" placeholder="Phone Number">
-                    <textarea rows="5" placeholder="Iyong Mensahe" required></textarea>
-                    <button type="submit" class="submit-btn">Ipadala ang Mensahe</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>BRIGADA NEWS FM</h3>
-                    <p>Ang Tinig ng Bayan</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">Facebook</a>
-                        <a href="#" class="social-link">Twitter</a>
-                        <a href="#" class="social-link">Instagram</a>
-                        <a href="#" class="social-link">YouTube</a>
-                    </div>
-                </div>
-
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <a href="#news">Balita</a>
-                    <a href="#schedule">Schedule</a>
-                    <a href="#about">About</a>
-                    <a href="#contact">Contact</a>
-                </div>
-
-                <div class="footer-section">
-                    <h4>Listen Live</h4>
-                    <p>FM 99.5 MHz</p>
-                    <p>Streaming 24/7</p>
+                    <form class="contact-form" id="contactForm">
+                        <input type="text" placeholder="Iyong Pangalan" required>
+                        <input type="email" placeholder="Email Address" required>
+                        <textarea rows="5" placeholder="Iyong Mensahe" required></textarea>
+                        <button type="submit" class="submit-btn">Ipadala ang Mensahe</button>
+                    </form>
                 </div>
             </div>
+        </section>
 
-            <div class="footer-bottom">
-                <p>&copy; 2025 Brigada News FM. All rights reserved.</p>
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h3>BRIGADA NEWS FM</h3>
+                        <p>Ang Tinig ng Bayan</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Quick Links</h4>
+                        <a href="#stations">Stations</a>
+                        <a href="#music">Music</a>
+                        <a href="#news">Balita</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Brigada News FM. All rights reserved.</p>
+                </div>
             </div>
-        </div>
-    </footer>
+        </footer>
+    </div>
 
     <script src="app.js"></script>
 </body>
