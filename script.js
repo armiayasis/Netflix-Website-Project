@@ -24,25 +24,40 @@ async function sendMessage() {
     try {
         // Call API
         const response = await fetch(`${API_URL}?ask=${encodeURIComponent(message)}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('API Response:', data);
         
         // Remove typing indicator
         removeTypingIndicator();
         
-        // Add bot response
-        if (data && data.response) {
-            addMessage(data.response, 'bot');
-        } else if (data && data.result) {
-            addMessage(data.result, 'bot');
-        } else if (data && data.message) {
-            addMessage(data.message, 'bot');
+        // Add bot response - check all possible response fields
+        let botReply = '';
+        
+        if (data.response) {
+            botReply = data.response;
+        } else if (data.result) {
+            botReply = data.result;
+        } else if (data.message) {
+            botReply = data.message;
+        } else if (data.answer) {
+            botReply = data.answer;
+        } else if (typeof data === 'string') {
+            botReply = data;
         } else {
-            addMessage('Sorry, I couldn\'t process that request.', 'bot');
+            botReply = 'Sorry, I couldn\'t process that request.';
+            console.log('Unexpected response format:', data);
         }
+        
+        addMessage(botReply, 'bot');
     } catch (error) {
         removeTypingIndicator();
-        addMessage('Sorry, there was an error connecting to the server.', 'bot');
-        console.error('Error:', error);
+        addMessage('Sorry, may error sa pag-connect sa AI server. Please try again.', 'bot');
+        console.error('Error details:', error);
     }
 }
 
