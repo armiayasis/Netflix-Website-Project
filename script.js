@@ -1,6 +1,5 @@
 
-const API_URL = 'https://arychauhann.onrender.com/api/gpt5';
-const UID = '61580959514473';
+const API_URL = 'https://betadash-api-swordslush-production.up.railway.app/gpt-5';
 const BOT_AVATAR = 'https://i.ibb.co/prfVyfQ/profile.jpg';
 const USER_AVATAR = 'https://via.placeholder.com/28/0084ff/ffffff?text=U';
 
@@ -24,7 +23,7 @@ async function sendMessage() {
     
     try {
         // Call API
-        const response = await fetch(`${API_URL}?prompt=${encodeURIComponent(message)}&uid=${UID}`);
+        const response = await fetch(`${API_URL}?ask=${encodeURIComponent(message)}`);
         const data = await response.json();
         
         // Remove typing indicator
@@ -33,6 +32,8 @@ async function sendMessage() {
         // Add bot response
         if (data && data.response) {
             addMessage(data.response, 'bot');
+        } else if (data && data.result) {
+            addMessage(data.result, 'bot');
         } else if (data && data.message) {
             addMessage(data.message, 'bot');
         } else {
