@@ -4,45 +4,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manila News - Latest Updates</title>
+    <title>STARCOPE REAL NEWS - Latest Updates</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
+    <nav class="navbar">
         <div class="container">
-            <h1>🌍 World News</h1>
-            <p>Latest news and updates from around the world</p>
-            <div class="header-controls">
-                <select id="country-filter" class="country-select">
-                    <option value="all">All Countries</option>
-                    <option value="us">United States</option>
-                    <option value="gb">United Kingdom</option>
-                    <option value="ca">Canada</option>
-                    <option value="au">Australia</option>
-                    <option value="in">India</option>
-                    <option value="ph">Philippines</option>
-                    <option value="sg">Singapore</option>
-                    <option value="my">Malaysia</option>
-                    <option value="jp">Japan</option>
-                    <option value="kr">South Korea</option>
-                </select>
-                <div class="update-info">
-                    <div id="last-updated" class="last-updated">Loading...</div>
-                    <div id="countdown" class="countdown">Next update in: 3:00</div>
-                </div>
+            <div class="nav-brand">
+                <i class="fas fa-star"></i>
+                <span>STARCOPE REAL NEWS</span>
+            </div>
+            <div class="nav-links">
+                <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#about" class="nav-link" data-page="about">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="container">
-        <div id="loading" class="loading">Loading news from multiple countries...</div>
-        <div id="error" class="error" style="display: none;"></div>
-        <div id="news-container" class="news-grid"></div>
-    </main>
+    <div id="dashboard-page" class="page active">
+        <header>
+            <div class="container">
+                <h1>🌟 STARCOPE REAL NEWS</h1>
+                <p>Your trusted source for real-time global news updates</p>
+                <div class="header-controls">
+                    <select id="country-filter" class="country-select">
+                        <option value="all">All Countries</option>
+                        <option value="us">United States</option>
+                        <option value="gb">United Kingdom</option>
+                        <option value="ca">Canada</option>
+                        <option value="au">Australia</option>
+                        <option value="in">India</option>
+                        <option value="ph">Philippines</option>
+                        <option value="sg">Singapore</option>
+                        <option value="my">Malaysia</option>
+                        <option value="jp">Japan</option>
+                        <option value="kr">South Korea</option>
+                    </select>
+                    <div class="update-info">
+                        <div id="last-updated" class="last-updated">Loading...</div>
+                        <div id="countdown" class="countdown">Next update in: 3:00</div>
+                    </div>
+                </div>
+                <div class="favorites-toggle">
+                    <button id="show-favorites" class="btn-favorites">
+                        <i class="fas fa-star"></i> Show Favorites (<span id="favorites-count">0</span>)
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container">
+            <div id="loading" class="loading">Loading news from multiple countries...</div>
+            <div id="error" class="error" style="display: none;"></div>
+            <div id="news-container" class="news-grid"></div>
+        </main>
+    </div>
+
+    <div id="about-page" class="page">
+        <div class="container about-container">
+            <div class="about-hero">
+                <i class="fas fa-star about-icon"></i>
+                <h1>About STARCOPE REAL NEWS</h1>
+                <p class="about-subtitle">Bringing you the truth, one story at a time</p>
+            </div>
+            
+            <div class="about-content">
+                <section class="about-section">
+                    <h2><i class="fas fa-newspaper"></i> Our Mission</h2>
+                    <p>STARCOPE REAL NEWS is dedicated to delivering accurate, timely, and unbiased news from around the world. We believe in the power of information and the importance of keeping our community informed.</p>
+                </section>
+
+                <section class="about-section">
+                    <h2><i class="fas fa-globe"></i> Global Coverage</h2>
+                    <p>We aggregate news from multiple countries including the United States, United Kingdom, Canada, Australia, India, Philippines, Singapore, Malaysia, Japan, and South Korea, ensuring you get a comprehensive view of world events.</p>
+                </section>
+
+                <section class="about-section">
+                    <h2><i class="fas fa-heart"></i> Features</h2>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check-circle"></i> Real-time news updates every 3 minutes</li>
+                        <li><i class="fas fa-check-circle"></i> Filter news by country</li>
+                        <li><i class="fas fa-check-circle"></i> Like and save your favorite articles</li>
+                        <li><i class="fas fa-check-circle"></i> Share articles with friends on Facebook</li>
+                        <li><i class="fas fa-check-circle"></i> Clean, modern, and mobile-friendly interface</li>
+                    </ul>
+                </section>
+
+                <section class="about-section">
+                    <h2><i class="fas fa-map-marker-alt"></i> Location</h2>
+                    <p>Proudly serving from <strong>Camarines Sur, Philippines</strong></p>
+                </section>
+
+                <section class="about-section contact-section">
+                    <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+                    <p>Have questions or feedback? We'd love to hear from you!</p>
+                    <p>Email: <a href="mailto:info@starcope.news">info@starcope.news</a></p>
+                </section>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div class="container">
-            <p>Powered by NewsData.io</p>
+            <p><i class="fas fa-flask"></i> POWERED BY STARCOPE BETA</p>
+            <p>Camarines Sur, Philippines</p>
+            <p class="footer-credits">Data provided by NewsData.io</p>
         </div>
     </footer>
 
