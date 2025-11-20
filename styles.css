@@ -1,4 +1,3 @@
-
 /* Search Container */
 .search-container {
     display: flex;
@@ -24,11 +23,57 @@
     box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
 }
 
+/* Search Button and other UI buttons */
 .search-btn {
     background: linear-gradient(135deg, #7e22ce 0%, #a855f7 100%);
     color: white;
-    border: none;
-    padding: 12px 25px;
+    border: 2px solid transparent;
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 6px 20px rgba(126, 34, 206, 0.4);
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.search-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.search-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.search-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(126, 34, 206, 0.6);
+    border-color: #a855f7;
+}
+
+.search-btn i {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.search-btn:hover i {
+    transform: scale(1.2) rotate(20deg);
+}
 
 
 /* Get Started Page */
@@ -452,41 +497,22 @@
         align-items: flex-start;
         gap: 15px;
     }
-    
+
     .music-controls {
         width: 100%;
         justify-content: center;
     }
-    
+
     .getstarted-hero h1 {
         font-size: 2em;
     }
-    
+
     .music-hero h1 {
         font-size: 2em;
     }
 }
 
-    border-radius: 10px;
-    font-size: 1em;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(126, 34, 206, 0.3);
-    white-space: nowrap;
-}
-
-.search-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(126, 34, 206, 0.5);
-}
-
-.search-btn i {
-    margin-right: 8px;
-}
-
-
-
+/* Global Styles */
 * {
     margin: 0;
     padding: 0;
@@ -976,29 +1002,29 @@ footer i {
     .news-grid {
         grid-template-columns: 1fr;
     }
-    
+
     header h1 {
         font-size: 2em;
     }
-    
+
     .header-controls {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .update-info {
         text-align: center;
     }
-    
+
     .nav-links {
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .about-hero h1 {
         font-size: 2em;
     }
-    
+
     .about-icon {
         font-size: 3em;
     }
