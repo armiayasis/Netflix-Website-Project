@@ -3,80 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Video Generator - Veo 2.0</title>
+    <title>World FM Radio - Listen to Millions of Radio Stations</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>🎬 AI Video Generator</h1>
-            <p class="subtitle">Powered by Google Veo 2.0</p>
+            <h1>📻 World FM Radio</h1>
+            <p class="subtitle">Listen to millions of radio stations from around the world</p>
         </header>
 
-        <div class="generator-section">
-            <div class="input-card">
-                <h2>Generate Your Video</h2>
-                
-                <div class="form-group">
-                    <label for="prompt">Video Description</label>
-                    <textarea 
-                        id="prompt" 
-                        placeholder="Describe the video you want to generate... Example: A serene beach at sunset with gentle waves"
-                        rows="4"
-                    ></textarea>
+        <div class="player-section">
+            <div class="now-playing-card" id="nowPlayingCard">
+                <div class="station-logo">
+                    <img id="stationLogo" src="" alt="Station Logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>'">
                 </div>
-
-                <div class="form-group">
-                    <label for="duration">Duration (seconds)</label>
-                    <select id="duration">
-                        <option value="4">4 seconds</option>
-                        <option value="6" selected>6 seconds</option>
-                        <option value="8">8 seconds</option>
-                    </select>
+                <div class="station-info">
+                    <h2 id="stationName">Select a radio station</h2>
+                    <p id="stationCountry">Choose from countries below</p>
+                    <p id="stationTags"></p>
                 </div>
-
-                <div class="form-group">
-                    <label for="aspectRatio">Aspect Ratio</label>
-                    <select id="aspectRatio">
-                        <option value="16:9" selected>16:9 (Landscape)</option>
-                        <option value="9:16">9:16 (Portrait)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="resolution">Resolution</label>
-                    <select id="resolution">
-                        <option value="720p" selected>720p</option>
-                        <option value="1080p">1080p</option>
-                    </select>
-                </div>
-
-                <button id="generateBtn" class="generate-btn" onclick="generateVideo()">
-                    <span id="btnText">Generate Video</span>
-                    <span id="btnLoader" class="loader" style="display: none;"></span>
-                </button>
-            </div>
-
-            <div class="result-section" id="resultSection" style="display: none;">
-                <h2>Your Generated Video</h2>
-                <div class="video-container" id="videoContainer">
-                    <video id="generatedVideo" controls></video>
-                </div>
-                <div class="video-info">
-                    <p id="videoInfo"></p>
-                    <a id="downloadBtn" class="download-btn" download>Download Video</a>
-                </div>
-            </div>
-
-            <div class="history-section">
-                <h3>Recent Generations</h3>
-                <div id="historyList" class="history-list">
-                    <p class="no-history">No videos generated yet</p>
+                <div class="player-controls">
+                    <button id="playBtn" class="play-btn" disabled>
+                        <span id="playIcon">▶️</span>
+                    </button>
+                    <div class="volume-control">
+                        <span>🔊</span>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="🔍 Search radio stations by name, country, or genre...">
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-group">
+                <label>Filter by Country:</label>
+                <select id="countryFilter">
+                    <option value="">All Countries</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Filter by Genre:</label>
+                <select id="genreFilter">
+                    <option value="">All Genres</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Sort by:</label>
+                <select id="sortBy">
+                    <option value="votes">Most Popular</option>
+                    <option value="name">Name (A-Z)</option>
+                    <option value="clickcount">Most Played</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3 id="totalStations">0</h3>
+                <p>Radio Stations</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalCountries">0</h3>
+                <p>Countries</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="nowListening">0</h3>
+                <p>Listeners Worldwide</p>
+            </div>
+        </div>
+
+        <div class="stations-section">
+            <h3>Radio Stations</h3>
+            <div id="loadingIndicator" class="loading">Loading stations...</div>
+            <div id="stationsList" class="stations-grid"></div>
+        </div>
+
+        <div class="popular-countries">
+            <h3>Popular Countries</h3>
+            <div class="country-chips" id="popularCountries"></div>
+        </div>
     </div>
 
+    <audio id="audioPlayer" preload="none"></audio>
     <script src="script.js"></script>
 </body>
 </html>

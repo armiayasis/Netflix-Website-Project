@@ -1,217 +1,343 @@
-let videoHistory = [];
-let currentOperationId = null;
-let pollingInterval = null;
+const API_BASE = 'https://de1.api.radio-browser.info/json';
 
-async function generateVideo() {
-    const prompt = document.getElementById('prompt').value.trim();
-    const duration = parseInt(document.getElementById('duration').value);
-    const aspectRatio = document.getElementById('aspectRatio').value;
-    const resolution = document.getElementById('resolution').value;
+let allStations = [];
+let filteredStations = [];
+let currentStation = null;
+let audioPlayer = null;
+let isPlaying = false;
 
-    if (!prompt) {
-        showMessage('Please enter a video description!', 'error');
-        return;
-    }
+const popularCountriesList = [
+    'United States', 'United Kingdom', 'Germany', 'France', 'Spain',
+    'Italy', 'Canada', 'Australia', 'Brazil', 'Japan', 'Philippines',
+    'India', 'Mexico', 'Netherlands', 'Sweden', 'Norway', 'Poland',
+    'Russia', 'Argentina', 'South Korea', 'Thailand', 'Indonesia'
+];
 
-    const generateBtn = document.getElementById('generateBtn');
-    const btnText = document.getElementById('btnText');
-    const btnLoader = document.getElementById('btnLoader');
-
-    generateBtn.disabled = true;
-    btnText.textContent = 'Starting generation...';
-    btnLoader.style.display = 'inline-block';
-
-    try {
-        const response = await fetch('/api/generate-video', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                prompt,
-                duration,
-                aspectRatio,
-                resolution
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            currentOperationId = data.operationName.split('/').pop();
-            btnText.textContent = 'Generating video... This may take a few minutes';
-            showMessage('Video generation started! Please wait...', 'success');
-            
-            startPolling(currentOperationId, prompt, duration, aspectRatio, resolution);
-        } else {
-            showMessage(data.error || 'Failed to start video generation', 'error');
-            resetButton();
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showMessage('An error occurred while starting video generation', 'error');
-        resetButton();
-    }
-}
-
-function startPolling(operationId, prompt, duration, aspectRatio, resolution) {
-    let attempts = 0;
-    const maxAttempts = 60;
-
-    pollingInterval = setInterval(async () => {
-        attempts++;
-
-        if (attempts > maxAttempts) {
-            clearInterval(pollingInterval);
-            showMessage('Video generation timed out. Please try again.', 'error');
-            resetButton();
-            return;
-        }
-
-        try {
-            const response = await fetch(`/api/check-operation/${operationId}`);
-            
-            if (!response.ok) {
-                clearInterval(pollingInterval);
-                const data = await response.json();
-                showMessage(data.error || `Server error: ${response.status}`, 'error');
-                resetButton();
-                return;
-            }
-
-            const data = await response.json();
-
-            if (data.done) {
-                clearInterval(pollingInterval);
-
-                if (data.error) {
-                    showMessage(`Generation failed: ${JSON.stringify(data.error)}`, 'error');
-                    resetButton();
-                } else if (data.videoUrl) {
-                    displayVideo(data.videoUrl, prompt, duration, aspectRatio, resolution);
-                    addToHistory({
-                        prompt,
-                        duration,
-                        aspectRatio,
-                        resolution,
-                        videoUrl: data.videoUrl,
-                        timestamp: new Date().toISOString()
-                    });
-                    showMessage('Video generated successfully!', 'success');
-                    resetButton();
-                } else {
-                    showMessage('Video generation completed but no video URL returned', 'error');
-                    resetButton();
-                }
-            } else {
-                const progress = Math.min(95, (attempts / maxAttempts) * 100);
-                document.getElementById('btnText').textContent = `Generating... ${Math.round(progress)}%`;
-            }
-        } catch (error) {
-            console.error('Polling error:', error);
-            clearInterval(pollingInterval);
-            showMessage('Network error while checking video status', 'error');
-            resetButton();
-        }
-    }, 10000);
-}
-
-function resetButton() {
-    const generateBtn = document.getElementById('generateBtn');
-    const btnText = document.getElementById('btnText');
-    const btnLoader = document.getElementById('btnLoader');
-
-    generateBtn.disabled = false;
-    btnText.textContent = 'Generate Video';
-    btnLoader.style.display = 'none';
-}
-
-function displayVideo(videoUrl, prompt, duration, aspectRatio, resolution) {
-    const resultSection = document.getElementById('resultSection');
-    const videoElement = document.getElementById('generatedVideo');
-    const videoInfo = document.getElementById('videoInfo');
-    const downloadBtn = document.getElementById('downloadBtn');
-
-    videoElement.src = videoUrl;
-    videoInfo.textContent = `Prompt: "${prompt}" | Aspect Ratio: ${aspectRatio} | Resolution: ${resolution}`;
-    downloadBtn.href = videoUrl;
-    downloadBtn.download = `video-${Date.now()}.mp4`;
-
-    resultSection.style.display = 'block';
-    resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function addToHistory(item) {
-    videoHistory.unshift(item);
-    if (videoHistory.length > 10) {
-        videoHistory.pop();
-    }
-    localStorage.setItem('videoHistory', JSON.stringify(videoHistory));
-    updateHistoryDisplay();
-}
-
-function updateHistoryDisplay() {
-    const historyList = document.getElementById('historyList');
+async function init() {
+    audioPlayer = document.getElementById('audioPlayer');
     
-    if (videoHistory.length === 0) {
-        historyList.innerHTML = '<p class="no-history">No videos generated yet</p>';
+    setupEventListeners();
+    await loadStations();
+    populateFilters();
+    displayPopularCountries();
+    updateStats();
+}
+
+function setupEventListeners() {
+    document.getElementById('playBtn').addEventListener('click', togglePlay);
+    document.getElementById('volumeSlider').addEventListener('input', updateVolume);
+    document.getElementById('searchInput').addEventListener('input', handleSearch);
+    document.getElementById('countryFilter').addEventListener('change', applyFilters);
+    document.getElementById('genreFilter').addEventListener('change', applyFilters);
+    document.getElementById('sortBy').addEventListener('change', applySorting);
+    
+    audioPlayer.addEventListener('play', () => {
+        isPlaying = true;
+        updatePlayButton();
+    });
+    
+    audioPlayer.addEventListener('pause', () => {
+        isPlaying = false;
+        updatePlayButton();
+    });
+    
+    audioPlayer.addEventListener('error', (e) => {
+        console.error('Audio error:', e);
+        showNotification('Failed to load radio stream. Trying alternative stream...', 'error');
+        isPlaying = false;
+        updatePlayButton();
+    });
+}
+
+async function loadStations() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    loadingIndicator.style.display = 'block';
+    
+    try {
+        const response = await fetch(`${API_BASE}/stations/search?limit=1000&order=votes&reverse=true&hidebroken=true`);
+        allStations = await response.json();
+        filteredStations = [...allStations];
+        
+        displayStations(filteredStations.slice(0, 50));
+        loadingIndicator.style.display = 'none';
+    } catch (error) {
+        console.error('Error loading stations:', error);
+        loadingIndicator.innerHTML = 'Failed to load stations. Please refresh the page.';
+    }
+}
+
+function populateFilters() {
+    const countries = [...new Set(allStations.map(s => s.country).filter(c => c))].sort();
+    const tags = [...new Set(allStations.flatMap(s => s.tags.split(',').map(t => t.trim()).filter(t => t)))].sort();
+    
+    const countrySelect = document.getElementById('countryFilter');
+    const genreSelect = document.getElementById('genreFilter');
+    
+    countries.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        countrySelect.appendChild(option);
+    });
+    
+    tags.slice(0, 50).forEach(tag => {
+        const option = document.createElement('option');
+        option.value = tag;
+        option.textContent = tag;
+        genreSelect.appendChild(option);
+    });
+}
+
+function displayPopularCountries() {
+    const container = document.getElementById('popularCountries');
+    
+    popularCountriesList.forEach(country => {
+        const chip = document.createElement('div');
+        chip.className = 'country-chip';
+        chip.textContent = `${getCountryFlag(country)} ${country}`;
+        chip.onclick = () => filterByCountry(country);
+        container.appendChild(chip);
+    });
+}
+
+function getCountryFlag(country) {
+    const flags = {
+        'United States': '🇺🇸',
+        'United Kingdom': '🇬🇧',
+        'Germany': '🇩🇪',
+        'France': '🇫🇷',
+        'Spain': '🇪🇸',
+        'Italy': '🇮🇹',
+        'Canada': '🇨🇦',
+        'Australia': '🇦🇺',
+        'Brazil': '🇧🇷',
+        'Japan': '🇯🇵',
+        'Philippines': '🇵🇭',
+        'India': '🇮🇳',
+        'Mexico': '🇲🇽',
+        'Netherlands': '🇳🇱',
+        'Sweden': '🇸🇪',
+        'Norway': '🇳🇴',
+        'Poland': '🇵🇱',
+        'Russia': '🇷🇺',
+        'Argentina': '🇦🇷',
+        'South Korea': '🇰🇷',
+        'Thailand': '🇹🇭',
+        'Indonesia': '🇮🇩'
+    };
+    return flags[country] || '🌍';
+}
+
+function displayStations(stations) {
+    const container = document.getElementById('stationsList');
+    container.innerHTML = '';
+    
+    if (stations.length === 0) {
+        container.innerHTML = '<p class="loading">No stations found. Try different filters.</p>';
         return;
     }
+    
+    stations.forEach(station => {
+        const card = createStationCard(station);
+        container.appendChild(card);
+    });
+}
 
-    historyList.innerHTML = videoHistory.map((item, index) => `
-        <div class="history-item" onclick="loadHistoryItem(${index})">
-            <div class="prompt-preview">${item.prompt}</div>
-            <div class="metadata">
-                <span>${item.aspectRatio}</span>
-                <span>${item.resolution}</span>
-                <span>${new Date(item.timestamp).toLocaleDateString()}</span>
+function createStationCard(station) {
+    const card = document.createElement('div');
+    card.className = 'station-card';
+    if (currentStation && currentStation.stationuuid === station.stationuuid) {
+        card.classList.add('playing');
+    }
+    
+    card.innerHTML = `
+        <div class="station-card-header">
+            <img class="station-card-logo" src="${station.favicon || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>'}" 
+                 alt="${station.name}"
+                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>'">
+            <div class="station-card-info">
+                <h4>${station.name}</h4>
+                <p>${getCountryFlag(station.country)} ${station.country || 'Unknown'}</p>
             </div>
         </div>
-    `).join('');
-}
-
-function loadHistoryItem(index) {
-    const item = videoHistory[index];
-    document.getElementById('prompt').value = item.prompt;
-    document.getElementById('duration').value = item.duration;
-    document.getElementById('aspectRatio').value = item.aspectRatio;
-    document.getElementById('resolution').value = item.resolution;
+        <div class="station-card-tags">${station.tags ? station.tags.split(',').slice(0, 3).join(', ') : 'General'}</div>
+        <div class="station-card-stats">
+            <span>👍 ${station.votes || 0}</span>
+            <span>▶️ ${station.clickcount || 0}</span>
+            <span>📶 ${station.bitrate || 0} kbps</span>
+        </div>
+    `;
     
-    if (item.videoUrl) {
-        displayVideo(item.videoUrl, item.prompt, item.duration, item.aspectRatio, item.resolution);
+    card.onclick = () => playStation(station);
+    return card;
+}
+
+async function playStation(station) {
+    currentStation = station;
+    
+    document.getElementById('stationName').textContent = station.name;
+    document.getElementById('stationCountry').textContent = `${getCountryFlag(station.country)} ${station.country || 'Unknown'}`;
+    document.getElementById('stationTags').textContent = station.tags ? station.tags.split(',').slice(0, 5).join(', ') : '';
+    document.getElementById('stationLogo').src = station.favicon || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📻</text></svg>';
+    
+    document.getElementById('playBtn').disabled = false;
+    
+    try {
+        await fetch(`${API_BASE}/url/${station.stationuuid}`);
+    } catch (e) {
+        console.log('Click tracking failed, but continuing...');
+    }
+    
+    audioPlayer.src = station.url_resolved || station.url;
+    audioPlayer.load();
+    
+    try {
+        await audioPlayer.play();
+        showNotification(`Now playing: ${station.name}`, 'success');
+    } catch (error) {
+        console.error('Playback error:', error);
+        showNotification('Failed to play station. Please try another one.', 'error');
+    }
+    
+    updateStationCards();
+}
+
+function togglePlay() {
+    if (!currentStation) return;
+    
+    if (isPlaying) {
+        audioPlayer.pause();
+    } else {
+        audioPlayer.play().catch(error => {
+            console.error('Play error:', error);
+            showNotification('Failed to resume playback', 'error');
+        });
     }
 }
 
-function showMessage(message, type) {
-    const existingMessages = document.querySelectorAll('.error-message, .success-message');
-    existingMessages.forEach(msg => msg.remove());
-
-    const messageDiv = document.createElement('div');
-    messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
-    messageDiv.textContent = message;
-
-    const inputCard = document.querySelector('.input-card');
-    inputCard.appendChild(messageDiv);
-
-    setTimeout(() => {
-        messageDiv.remove();
-    }, 8000);
+function updatePlayButton() {
+    const playIcon = document.getElementById('playIcon');
+    playIcon.textContent = isPlaying ? '⏸️' : '▶️';
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const savedHistory = localStorage.getItem('videoHistory');
-    if (savedHistory) {
-        try {
-            videoHistory = JSON.parse(savedHistory);
-        } catch (e) {
-            videoHistory = [];
+function updateVolume(e) {
+    const volume = e.target.value / 100;
+    audioPlayer.volume = volume;
+}
+
+function handleSearch(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    applyFilters(searchTerm);
+}
+
+function applyFilters(searchTerm = null) {
+    const search = searchTerm || document.getElementById('searchInput').value.toLowerCase();
+    const country = document.getElementById('countryFilter').value;
+    const genre = document.getElementById('genreFilter').value;
+    
+    filteredStations = allStations.filter(station => {
+        const matchesSearch = !search || 
+            station.name.toLowerCase().includes(search) ||
+            station.country.toLowerCase().includes(search) ||
+            station.tags.toLowerCase().includes(search);
+        
+        const matchesCountry = !country || station.country === country;
+        const matchesGenre = !genre || station.tags.toLowerCase().includes(genre.toLowerCase());
+        
+        return matchesSearch && matchesCountry && matchesGenre;
+    });
+    
+    applySorting();
+}
+
+function applySorting() {
+    const sortBy = document.getElementById('sortBy').value;
+    
+    filteredStations.sort((a, b) => {
+        switch (sortBy) {
+            case 'votes':
+                return (b.votes || 0) - (a.votes || 0);
+            case 'clickcount':
+                return (b.clickcount || 0) - (a.clickcount || 0);
+            case 'name':
+                return a.name.localeCompare(b.name);
+            default:
+                return 0;
         }
-    }
-    updateHistoryDisplay();
-});
+    });
+    
+    displayStations(filteredStations.slice(0, 50));
+    updateStats();
+}
 
-window.addEventListener('beforeunload', () => {
-    if (pollingInterval) {
-        clearInterval(pollingInterval);
+function filterByCountry(country) {
+    document.getElementById('countryFilter').value = country;
+    applyFilters();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateStationCards() {
+    document.querySelectorAll('.station-card').forEach(card => {
+        card.classList.remove('playing');
+    });
+    
+    if (currentStation) {
+        const playingCards = Array.from(document.querySelectorAll('.station-card')).filter(card => 
+            card.textContent.includes(currentStation.name)
+        );
+        playingCards.forEach(card => card.classList.add('playing'));
     }
-});
+}
+
+function updateStats() {
+    const totalStations = filteredStations.length;
+    const countries = [...new Set(filteredStations.map(s => s.country).filter(c => c))];
+    const totalListeners = filteredStations.reduce((sum, s) => sum + (s.clickcount || 0), 0);
+    
+    document.getElementById('totalStations').textContent = totalStations.toLocaleString();
+    document.getElementById('totalCountries').textContent = countries.length;
+    document.getElementById('nowListening').textContent = totalListeners.toLocaleString();
+}
+
+function showNotification(message, type) {
+    const existingNotif = document.querySelector('.notification');
+    if (existingNotif) existingNotif.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: ${type === 'success' ? '#10b981' : '#ef4444'};
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+document.addEventListener('DOMContentLoaded', init);
