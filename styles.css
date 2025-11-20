@@ -504,17 +504,51 @@ body {
 
 /* Navbar */
 .navbar {
-    background: transparent;
+    background: rgba(30, 60, 114, 0.95);
     padding: 15px 0;
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(30, 60, 114, 0.98);
+        flex-direction: column;
+        padding: 20px;
+        display: none;
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+}
+
 .navbar .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.nav-container {
+    position: relative;
 }
 
 .nav-brand {
@@ -524,7 +558,6 @@ body {
     color: #fbbf24;
     font-size: 1.5em;
     font-weight: bold;
-    text-transform: uppercase;
 }
 
 .nav-brand i {
