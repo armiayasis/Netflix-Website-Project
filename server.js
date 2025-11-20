@@ -1,297 +1,192 @@
-
 const express = require('express');
 const path = require('path');
-const Database = require('@replit/database');
+const axios = require('axios');
 
 const app = express();
-const db = new Database();
 const PORT = 5000;
+
+const API_KEY = process.env.GOOGLE_AI_API_KEY;
+const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Helper Functions
-function getUserKey(mobile) {
-    return `user_${mobile}`;
+async function pollOperation(operationName, maxAttempts = 60, delayMs = 10000) {
+    for (let i = 0; i < maxAttempts; i++) {
+        try {
+            const response = await axios.get(`${BASE_URL}/${operationName}`, {
+                headers: {
+                    'x-goog-api-key': API_KEY
+                }
+            });
+
+            const operation = response.data;
+
+            if (operation.done) {
+                if (operation.error) {
+                    throw new Error(`Operation failed: ${JSON.stringify(operation.error)}`);
+                }
+                return operation.response;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+        } catch (error) {
+            if (error.response) {
+                throw new Error(`Poll error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+            }
+            throw error;
+        }
+    }
+
+    throw new Error('Operation timed out');
 }
 
-function getTransactionsKey(mobile) {
-    return `transactions_${mobile}`;
-}
+app.post('/api/generate-video', async (req, res) => {
+    const { prompt, duration, aspectRatio, resolution } = req.body;
 
-// Register endpoint
-app.post('/api/register', async (req, res) => {
-    const { name, mobile, pin } = req.body;
-
-    if (!name || !mobile || !pin) {
-        return res.status(400).json({ error: 'All fields are required!' });
+    if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required!' });
     }
 
-    if (!/^09\d{9}$/.test(mobile)) {
-        return res.status(400).json({ error: 'Invalid mobile number!' });
-    }
-
-    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-        return res.status(400).json({ error: 'PIN must be 4 digits!' });
+    if (!API_KEY) {
+        return res.status(500).json({ error: 'API key not configured!' });
     }
 
     try {
-        const userKey = getUserKey(mobile);
-        const existingUser = await db.get(userKey);
+        console.log('Starting video generation with prompt:', prompt);
 
-        if (existingUser) {
-            return res.status(400).json({ error: 'Mobile number already registered!' });
-        }
-
-        const user = {
-            name,
-            mobile,
-            pin,
-            balance: 0,
-            createdAt: new Date().toISOString()
+        const requestBody = {
+            instances: [{
+                prompt: prompt
+            }],
+            parameters: {
+                aspectRatio: aspectRatio || '16:9',
+                personGeneration: 'allow_adult'
+            }
         };
 
-        await db.set(userKey, user);
-        await db.set(getTransactionsKey(mobile), []);
+        const response = await axios.post(
+            `${BASE_URL}/models/veo-2.0-generate-001:predictLongRunning`,
+            requestBody,
+            {
+                headers: {
+                    'x-goog-api-key': API_KEY,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
 
-        res.json({ message: 'Registration successful!', user: { name, mobile } });
+        const operationName = response.data.name;
+        console.log('Operation started:', operationName);
+
+        res.json({
+            message: 'Video generation started. This will take a few minutes...',
+            operationName: operationName
+        });
+
+        (async () => {
+            try {
+                const result = await pollOperation(operationName);
+                console.log('Video generation completed:', result);
+            } catch (error) {
+                console.error('Background polling error:', error.message);
+            }
+        })();
+
     } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
+        console.error('Error generating video:', error);
+
+        if (error.response) {
+            const status = error.response.status;
+            const errorData = error.response.data;
+
+            if (status === 401 || status === 403) {
+                return res.status(401).json({
+                    error: 'Invalid or expired API key. Please check your Google AI API key.',
+                    details: errorData
+                });
+            }
+
+            if (status === 429) {
+                return res.status(429).json({
+                    error: 'API rate limit exceeded. Please try again later.',
+                    details: errorData
+                });
+            }
+
+            return res.status(status).json({
+                error: `API error: ${status}`,
+                details: errorData
+            });
+        }
+
+        res.status(500).json({
+            error: 'Failed to generate video',
+            message: error.message
+        });
     }
 });
 
-// Login endpoint
-app.post('/api/login', async (req, res) => {
-    const { mobile, pin } = req.body;
+app.get('/api/check-operation/:operationId', async (req, res) => {
+    const operationId = req.params.operationId;
 
-    if (!mobile || !pin) {
-        return res.status(400).json({ error: 'Mobile and PIN are required!' });
+    if (!API_KEY) {
+        return res.status(500).json({ error: 'API key not configured!' });
     }
 
     try {
-        const userKey = getUserKey(mobile);
-        const user = await db.get(userKey);
+        const response = await axios.get(`${BASE_URL}/operations/${operationId}`, {
+            headers: {
+                'x-goog-api-key': API_KEY
+            }
+        });
 
-        if (!user) {
-            return res.status(401).json({ error: 'User not found!' });
+        const operation = response.data;
+
+        if (operation.done) {
+            if (operation.error) {
+                return res.status(500).json({
+                    done: true,
+                    error: operation.error
+                });
+            }
+
+            const videoUri = operation.response?.generatedSamples?.[0]?.video?.uri;
+
+            return res.json({
+                done: true,
+                videoUrl: videoUri,
+                response: operation.response
+            });
         }
 
-        if (user.pin !== pin) {
-            return res.status(401).json({ error: 'Invalid PIN!' });
-        }
-
-        res.json({ message: 'Login successful!', user: { name: user.name, mobile: user.mobile } });
+        res.json({
+            done: false,
+            metadata: operation.metadata
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
+        console.error('Error checking operation:', error);
+
+        if (error.response) {
+            return res.status(error.response.status).json({
+                error: `API error: ${error.response.status}`,
+                details: error.response.data
+            });
+        }
+
+        res.status(500).json({
+            error: 'Failed to check operation status',
+            message: error.message
+        });
     }
 });
 
-// Get balance endpoint
-app.get('/api/balance/:mobile', async (req, res) => {
-    const { mobile } = req.params;
-
-    try {
-        const userKey = getUserKey(mobile);
-        const user = await db.get(userKey);
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found!' });
-        }
-
-        res.json({ balance: user.balance || 0 });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
-    }
-});
-
-// Get transactions endpoint
-app.get('/api/transactions/:mobile', async (req, res) => {
-    const { mobile } = req.params;
-
-    try {
-        const transactionsKey = getTransactionsKey(mobile);
-        const transactions = await db.get(transactionsKey) || [];
-
-        res.json({ transactions: transactions.reverse() });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
-    }
-});
-
-// Deposit endpoint
-app.post('/api/deposit', async (req, res) => {
-    const { mobile, amount, note } = req.body;
-
-    if (!mobile || !amount || amount <= 0) {
-        return res.status(400).json({ error: 'Invalid request!' });
-    }
-
-    try {
-        const userKey = getUserKey(mobile);
-        const user = await db.get(userKey);
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found!' });
-        }
-
-        user.balance = (user.balance || 0) + amount;
-        await db.set(userKey, user);
-
-        const transaction = {
-            type: 'Deposit',
-            icon: '💰',
-            amount: amount,
-            note: note || '',
-            date: new Date().toISOString()
-        };
-
-        const transactionsKey = getTransactionsKey(mobile);
-        const transactions = await db.get(transactionsKey) || [];
-        transactions.push(transaction);
-        await db.set(transactionsKey, transactions);
-
-        res.json({ message: 'Deposit successful!', balance: user.balance });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
-    }
-});
-
-// Withdraw endpoint
-app.post('/api/withdraw', async (req, res) => {
-    const { mobile, amount, note, pin } = req.body;
-
-    if (!mobile || !amount || amount <= 0 || !pin) {
-        return res.status(400).json({ error: 'Invalid request!' });
-    }
-
-    try {
-        const userKey = getUserKey(mobile);
-        const user = await db.get(userKey);
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found!' });
-        }
-
-        if (user.pin !== pin) {
-            return res.status(401).json({ error: 'Invalid PIN!' });
-        }
-
-        if (user.balance < amount) {
-            return res.status(400).json({ error: 'Insufficient balance!' });
-        }
-
-        user.balance -= amount;
-        await db.set(userKey, user);
-
-        const transaction = {
-            type: 'Withdraw',
-            icon: '💸',
-            amount: -amount,
-            note: note || '',
-            date: new Date().toISOString()
-        };
-
-        const transactionsKey = getTransactionsKey(mobile);
-        const transactions = await db.get(transactionsKey) || [];
-        transactions.push(transaction);
-        await db.set(transactionsKey, transactions);
-
-        res.json({ message: 'Withdrawal successful!', balance: user.balance });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
-    }
-});
-
-// GCash deposit endpoint
-app.post('/api/gcash-deposit', async (req, res) => {
-    const { mobile, gcashNumber, amount, refNumber } = req.body;
-
-    if (!mobile || !gcashNumber || !amount || !refNumber) {
-        return res.status(400).json({ error: 'All fields are required!' });
-    }
-
-    try {
-        const userKey = getUserKey(mobile);
-        const user = await db.get(userKey);
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found!' });
-        }
-
-        user.balance = (user.balance || 0) + amount;
-        await db.set(userKey, user);
-
-        const transaction = {
-            type: 'GCash Deposit',
-            icon: '📱',
-            amount: amount,
-            note: `From GCash ${gcashNumber} - Ref: ${refNumber}`,
-            date: new Date().toISOString()
-        };
-
-        const transactionsKey = getTransactionsKey(mobile);
-        const transactions = await db.get(transactionsKey) || [];
-        transactions.push(transaction);
-        await db.set(transactionsKey, transactions);
-
-        res.json({ message: 'GCash deposit successful!', balance: user.balance });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
-    }
-});
-
-// GCash withdraw endpoint
-app.post('/api/gcash-withdraw', async (req, res) => {
-    const { mobile, gcashNumber, amount, pin } = req.body;
-
-    if (!mobile || !gcashNumber || !amount || !pin) {
-        return res.status(400).json({ error: 'All fields are required!' });
-    }
-
-    try {
-        const userKey = getUserKey(mobile);
-        const user = await db.get(userKey);
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found!' });
-        }
-
-        if (user.pin !== pin) {
-            return res.status(401).json({ error: 'Invalid PIN!' });
-        }
-
-        if (user.balance < amount) {
-            return res.status(400).json({ error: 'Insufficient balance!' });
-        }
-
-        user.balance -= amount;
-        await db.set(userKey, user);
-
-        const transaction = {
-            type: 'GCash Withdrawal',
-            icon: '📱',
-            amount: -amount,
-            note: `To GCash ${gcashNumber}`,
-            date: new Date().toISOString()
-        };
-
-        const transactionsKey = getTransactionsKey(mobile);
-        const transactions = await db.get(transactionsKey) || [];
-        transactions.push(transaction);
-        await db.set(transactionsKey, transactions);
-
-        res.json({ message: 'GCash withdrawal successful!', balance: user.balance });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error!' });
-    }
-});
-
-// Serve index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`STAR SAVINGS server running on port ${PORT}`);
-    console.log(`Open your browser to start saving!`);
+    console.log(`AI Video Generator server running on port ${PORT}`);
+    console.log(`Using Google Veo 2.0 model`);
+    console.log(`API Key configured: ${API_KEY ? 'Yes' : 'No'}`);
 });
