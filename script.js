@@ -34,6 +34,183 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
+// Get Started button
+const gotoButton = document.getElementById('goto-dashboard');
+if (gotoButton) {
+    gotoButton.addEventListener('click', () => {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelector('.nav-link[data-page="dashboard"]').classList.add('active');
+        
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('dashboard-page').classList.add('active');
+    });
+}
+
+// Music Upload Functionality
+let musicLibrary = JSON.parse(localStorage.getItem('starcope_music') || '[]');
+
+function updateMusicCount() {
+    const countElement = document.getElementById('music-count');
+    if (countElement) {
+        countElement.textContent = musicLibrary.length;
+    }
+}
+
+function displayMusicList() {
+    const musicListContainer = document.getElementById('music-list');
+    if (!musicListContainer) return;
+    
+    musicListContainer.innerHTML = '';
+    
+    if (musicLibrary.length === 0) {
+        musicListContainer.innerHTML = '<p class="no-music">No music uploaded yet. Be the first to share!</p>';
+        return;
+    }
+    
+    musicLibrary.forEach((music, index) => {
+        const musicCard = document.createElement('div');
+        musicCard.className = 'music-card';
+        musicCard.innerHTML = `
+            <div class="music-info">
+                <h3 class="music-title"><i class="fas fa-music"></i> ${music.title}</h3>
+                <p class="music-artist"><i class="fas fa-user"></i> ${music.artist}</p>
+                <p class="music-uploaded">Uploaded: ${music.uploadDate}</p>
+            </div>
+            <div class="music-controls">
+                <audio id="audio-${index}" src="${music.fileUrl}" preload="metadata"></audio>
+                <button class="music-btn btn-play" data-index="${index}">
+                    <i class="fas fa-play"></i> Play
+                </button>
+                <button class="music-btn btn-download" data-url="${music.fileUrl}" data-title="${music.title}">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button class="music-btn btn-delete" data-index="${index}">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        `;
+        
+        musicListContainer.appendChild(musicCard);
+    });
+    
+    // Add event listeners for music controls
+    document.querySelectorAll('.btn-play').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = this.dataset.index;
+            const audio = document.getElementById(`audio-${index}`);
+            const icon = this.querySelector('i');
+            
+            // Stop all other audio
+            document.querySelectorAll('audio').forEach((a, i) => {
+                if (i !== parseInt(index)) {
+                    a.pause();
+                    a.currentTime = 0;
+                    const otherBtn = document.querySelector(`.btn-play[data-index="${i}"]`);
+                    if (otherBtn) {
+                        otherBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+                    }
+                }
+            });
+            
+            if (audio.paused) {
+                audio.play().then(() => {
+                    this.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                }).catch(err => {
+                    console.error('Play error:', err);
+                    alert('Error playing audio. Please try again.');
+                });
+            } else {
+                audio.pause();
+                this.innerHTML = '<i class="fas fa-play"></i> Play';
+            }
+            
+            audio.addEventListener('ended', () => {
+                this.innerHTML = '<i class="fas fa-play"></i> Play';
+            });
+            
+            audio.addEventListener('error', (e) => {
+                console.error('Audio error:', e);
+                alert('Error loading audio file.');
+            });
+        });
+    });
+    
+    document.querySelectorAll('.btn-download').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = this.dataset.url;
+            const title = this.dataset.title;
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title}.mp3`;
+            a.click();
+        });
+    });
+    
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = this.dataset.index;
+            if (confirm('Are you sure you want to delete this music?')) {
+                musicLibrary.splice(index, 1);
+                localStorage.setItem('starcope_music', JSON.stringify(musicLibrary));
+                displayMusicList();
+                updateMusicCount();
+            }
+        });
+    });
+}
+
+const uploadMusicBtn = document.getElementById('upload-music-btn');
+if (uploadMusicBtn) {
+    uploadMusicBtn.addEventListener('click', () => {
+        const titleInput = document.getElementById('song-title');
+        const artistInput = document.getElementById('artist-name');
+        const fileInput = document.getElementById('music-file');
+        
+        const title = titleInput.value.trim();
+        const artist = artistInput.value.trim();
+        const file = fileInput.files[0];
+        
+        if (!title || !artist || !file) {
+            alert('Please fill in all fields and select a music file.');
+            return;
+        }
+        
+        if (!file.type.startsWith('audio/')) {
+            alert('Please select a valid audio file.');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const musicData = {
+                title: title,
+                artist: artist,
+                fileUrl: e.target.result,
+                uploadDate: new Date().toLocaleDateString()
+            };
+            
+            musicLibrary.unshift(musicData);
+            localStorage.setItem('starcope_music', JSON.stringify(musicLibrary));
+            
+            titleInput.value = '';
+            artistInput.value = '';
+            fileInput.value = '';
+            
+            displayMusicList();
+            updateMusicCount();
+            alert('Music uploaded successfully!');
+        };
+        
+        reader.readAsDataURL(file);
+    });
+}
+
+// Initialize music list on page load
+if (document.getElementById('music-list')) {
+    displayMusicList();
+    updateMusicCount();
+}
+
 // Favorites toggle
 document.getElementById('show-favorites').addEventListener('click', () => {
     showingFavorites = !showingFavorites;

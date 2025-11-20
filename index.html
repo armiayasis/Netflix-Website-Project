@@ -15,8 +15,14 @@
                 <span>STARCOPE REAL NEWS</span>
             </div>
             <div class="nav-links">
-                <a href="#dashboard" class="nav-link active" data-page="dashboard">
+                <a href="#getstarted" class="nav-link active" data-page="getstarted">
+                    <i class="fas fa-rocket"></i> Get Started
+                </a>
+                <a href="#dashboard" class="nav-link" data-page="dashboard">
                     <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#starmusic" class="nav-link" data-page="starmusic">
+                    <i class="fas fa-music"></i> Star Music
                 </a>
                 <a href="#about" class="nav-link" data-page="about">
                     <i class="fas fa-info-circle"></i> About
@@ -25,7 +31,58 @@
         </div>
     </nav>
 
-    <div id="dashboard-page" class="page active">
+    <div id="getstarted-page" class="page active">
+        <div class="container getstarted-container">
+            <div class="getstarted-hero">
+                <i class="fas fa-star getstarted-icon"></i>
+                <h1>Welcome to STARCOPE</h1>
+                <p class="getstarted-subtitle">Your Ultimate Hub for News & Music</p>
+            </div>
+
+            <div class="features-showcase">
+                <div class="feature-card">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>Real-Time News</h3>
+                    <p>Stay updated with the latest news from around the world, updated every 3 minutes</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-music"></i>
+                    <h3>Music Upload & Share</h3>
+                    <p>Upload your favorite music, share with others, and discover new tracks</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-download"></i>
+                    <h3>Download & Save</h3>
+                    <p>Save your favorite articles and music for offline access</p>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <button class="btn-cta" id="goto-dashboard">
+                    <i class="fas fa-arrow-right"></i> Get Started - Go to Dashboard
+                </button>
+            </div>
+
+            <div class="social-section">
+                <h3><i class="fas fa-share-alt"></i> Connect With Us</h3>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/starcopebetacommenthightlight" target="_blank" class="social-link facebook">
+                        <i class="fab fa-facebook"></i> Follow Us on Facebook
+                    </a>
+                </div>
+            </div>
+
+            <div class="contact-box">
+                <h3><i class="fas fa-bug"></i> Report Issues</h3>
+                <p>Found a bug or have suggestions? We'd love to hear from you!</p>
+                <a href="mailto:startcopebeta5@gmail.com" class="email-link">
+                    <i class="fas fa-envelope"></i> startcopebeta5@gmail.com
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-page" class="page">
         <header>
             <div class="container">
                 <h1>🌟 STARCOPE REAL NEWS</h1>
@@ -108,6 +165,49 @@
                     <p>Have questions or feedback? We'd love to hear from you!</p>
                     <p>Email: <a href="mailto:info@starcope.news">info@starcope.news</a></p>
                 </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="starmusic-page" class="page">
+        <div class="container music-container">
+            <div class="music-hero">
+                <i class="fas fa-music music-icon"></i>
+                <h1>STARMUSIC UPLOAD</h1>
+                <p class="music-subtitle">Upload, Share, and Discover Music</p>
+            </div>
+
+            <div class="upload-section">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Your Music</h2>
+                <div class="upload-form">
+                    <input type="text" id="song-title" class="music-input" placeholder="Song Title">
+                    <input type="text" id="artist-name" class="music-input" placeholder="Artist Name">
+                    <input type="file" id="music-file" class="file-input" accept="audio/*">
+                    <button id="upload-music-btn" class="btn-upload">
+                        <i class="fas fa-upload"></i> Upload Music
+                    </button>
+                </div>
+            </div>
+
+            <div class="music-list-section">
+                <h2><i class="fas fa-list"></i> Available Music (<span id="music-count">0</span>)</h2>
+                <div id="music-list" class="music-list"></div>
+            </div>
+
+            <div class="music-footer-info">
+                <div class="info-box">
+                    <h3><i class="fas fa-bug"></i> Report Issues</h3>
+                    <p>Encountered a problem? Let us know!</p>
+                    <a href="mailto:startcopebeta5@gmail.com" class="email-link">
+                        <i class="fas fa-envelope"></i> startcopebeta5@gmail.com
+                    </a>
+                </div>
+                <div class="info-box">
+                    <h3><i class="fas fa-share-alt"></i> Follow Us</h3>
+                    <a href="https://www.facebook.com/starcopebetacommenthightlight" target="_blank" class="social-link facebook">
+                        <i class="fab fa-facebook"></i> Facebook
+                    </a>
+                </div>
             </div>
         </div>
     </div>
