@@ -1,137 +1,77 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAR SAVINGS - Your Digital Piggy Bank</title>
+    <title>AI Video Generator - Veo 2.0</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Login/Register Screen -->
-    <div class="auth-container" id="authContainer">
-        <div class="auth-card">
-            <h1>⭐ STAR SAVINGS</h1>
-            <p class="tagline">Save Smart, Grow Rich</p>
-            
-            <div class="auth-tabs">
-                <button class="auth-tab active" onclick="showLogin()">Login</button>
-                <button class="auth-tab" onclick="showRegister()">Register</button>
-            </div>
+    <div class="container">
+        <header class="header">
+            <h1>🎬 AI Video Generator</h1>
+            <p class="subtitle">Powered by Google Veo 2.0</p>
+        </header>
 
-            <!-- Login Form -->
-            <div id="loginForm" class="auth-form">
-                <input type="tel" id="loginMobile" placeholder="Mobile Number (09xxxxxxxxx)" maxlength="11">
-                <input type="password" id="loginPin" placeholder="4-Digit PIN" maxlength="4">
-                <button onclick="login()">Login</button>
-            </div>
-
-            <!-- Register Form -->
-            <div id="registerForm" class="auth-form" style="display: none;">
-                <input type="text" id="regName" placeholder="Full Name">
-                <input type="tel" id="regMobile" placeholder="Mobile Number (09xxxxxxxxx)" maxlength="11">
-                <input type="password" id="regPin" placeholder="Create 4-Digit PIN" maxlength="4">
-                <input type="password" id="regConfirmPin" placeholder="Confirm PIN" maxlength="4">
-                <button onclick="register()">Register</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main App -->
-    <div class="app-container" id="appContainer" style="display: none;">
-        <!-- Header -->
-        <div class="app-header">
-            <div class="user-info">
-                <h2 id="userName">Welcome!</h2>
-                <p id="userMobile"></p>
-            </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-
-        <!-- Balance Card -->
-        <div class="balance-card">
-            <p class="balance-label">Total Savings</p>
-            <h1 class="balance-amount" id="balanceAmount">₱0.00</h1>
-            <p class="last-update" id="lastUpdate">Last updated: Never</p>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <button class="action-btn deposit-btn" onclick="showDepositModal()">
-                <span class="icon">💰</span>
-                <span>Deposit</span>
-            </button>
-            <button class="action-btn withdraw-btn" onclick="showWithdrawModal()">
-                <span class="icon">💸</span>
-                <span>Withdraw</span>
-            </button>
-            <button class="action-btn gcash-btn" onclick="showGCashModal()">
-                <span class="icon">📱</span>
-                <span>GCash</span>
-            </button>
-        </div>
-
-        <!-- Transaction History -->
-        <div class="transaction-section">
-            <h3>Transaction History</h3>
-            <div class="transaction-list" id="transactionList">
-                <p class="no-transactions">No transactions yet</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Deposit Modal -->
-    <div class="modal" id="depositModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('depositModal')">&times;</span>
-            <h2>💰 Deposit Money</h2>
-            <div class="modal-body">
-                <input type="number" id="depositAmount" placeholder="Enter amount">
-                <input type="text" id="depositNote" placeholder="Note (optional)">
-                <button class="modal-btn" onclick="deposit()">Deposit</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Withdraw Modal -->
-    <div class="modal" id="withdrawModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('withdrawModal')">&times;</span>
-            <h2>💸 Withdraw Money</h2>
-            <div class="modal-body">
-                <input type="number" id="withdrawAmount" placeholder="Enter amount">
-                <input type="text" id="withdrawNote" placeholder="Note (optional)">
-                <input type="password" id="withdrawPin" placeholder="Enter PIN to confirm" maxlength="4">
-                <button class="modal-btn" onclick="withdraw()">Withdraw</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- GCash Modal -->
-    <div class="modal" id="gcashModal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('gcashModal')">&times;</span>
-            <h2>📱 GCash Transfer</h2>
-            <div class="modal-body">
-                <div class="gcash-tabs">
-                    <button class="gcash-tab active" onclick="showGCashDeposit()">Deposit from GCash</button>
-                    <button class="gcash-tab" onclick="showGCashWithdraw()">Send to GCash</button>
+        <div class="generator-section">
+            <div class="input-card">
+                <h2>Generate Your Video</h2>
+                
+                <div class="form-group">
+                    <label for="prompt">Video Description</label>
+                    <textarea 
+                        id="prompt" 
+                        placeholder="Describe the video you want to generate... Example: A serene beach at sunset with gentle waves"
+                        rows="4"
+                    ></textarea>
                 </div>
 
-                <!-- GCash Deposit -->
-                <div id="gcashDepositForm" class="gcash-form">
-                    <input type="tel" id="gcashDepositNumber" placeholder="GCash Number (09xxxxxxxxx)" maxlength="11">
-                    <input type="number" id="gcashDepositAmount" placeholder="Amount">
-                    <input type="text" id="gcashDepositRef" placeholder="Reference Number">
-                    <button class="modal-btn" onclick="gcashDeposit()">Submit Deposit</button>
+                <div class="form-group">
+                    <label for="duration">Duration (seconds)</label>
+                    <select id="duration">
+                        <option value="4">4 seconds</option>
+                        <option value="6" selected>6 seconds</option>
+                        <option value="8">8 seconds</option>
+                    </select>
                 </div>
 
-                <!-- GCash Withdraw -->
-                <div id="gcashWithdrawForm" class="gcash-form" style="display: none;">
-                    <input type="tel" id="gcashWithdrawNumber" placeholder="GCash Number (09xxxxxxxxx)" maxlength="11">
-                    <input type="number" id="gcashWithdrawAmount" placeholder="Amount">
-                    <input type="password" id="gcashWithdrawPin" placeholder="Enter PIN" maxlength="4">
-                    <button class="modal-btn" onclick="gcashWithdraw()">Send to GCash</button>
+                <div class="form-group">
+                    <label for="aspectRatio">Aspect Ratio</label>
+                    <select id="aspectRatio">
+                        <option value="16:9" selected>16:9 (Landscape)</option>
+                        <option value="9:16">9:16 (Portrait)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="resolution">Resolution</label>
+                    <select id="resolution">
+                        <option value="720p" selected>720p</option>
+                        <option value="1080p">1080p</option>
+                    </select>
+                </div>
+
+                <button id="generateBtn" class="generate-btn" onclick="generateVideo()">
+                    <span id="btnText">Generate Video</span>
+                    <span id="btnLoader" class="loader" style="display: none;"></span>
+                </button>
+            </div>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <h2>Your Generated Video</h2>
+                <div class="video-container" id="videoContainer">
+                    <video id="generatedVideo" controls></video>
+                </div>
+                <div class="video-info">
+                    <p id="videoInfo"></p>
+                    <a id="downloadBtn" class="download-btn" download>Download Video</a>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <h3>Recent Generations</h3>
+                <div id="historyList" class="history-list">
+                    <p class="no-history">No videos generated yet</p>
                 </div>
             </div>
         </div>
