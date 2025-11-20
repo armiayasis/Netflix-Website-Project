@@ -10,13 +10,32 @@
 <body>
     <header>
         <div class="container">
-            <h1>📰 Manila News</h1>
-            <p>Latest news and updates from Manila</p>
+            <h1>🌍 World News</h1>
+            <p>Latest news and updates from around the world</p>
+            <div class="header-controls">
+                <select id="country-filter" class="country-select">
+                    <option value="all">All Countries</option>
+                    <option value="us">United States</option>
+                    <option value="gb">United Kingdom</option>
+                    <option value="ca">Canada</option>
+                    <option value="au">Australia</option>
+                    <option value="in">India</option>
+                    <option value="ph">Philippines</option>
+                    <option value="sg">Singapore</option>
+                    <option value="my">Malaysia</option>
+                    <option value="jp">Japan</option>
+                    <option value="kr">South Korea</option>
+                </select>
+                <div class="update-info">
+                    <div id="last-updated" class="last-updated">Loading...</div>
+                    <div id="countdown" class="countdown">Next update in: 3:00</div>
+                </div>
+            </div>
         </div>
     </header>
 
     <main class="container">
-        <div id="loading" class="loading">Loading news...</div>
+        <div id="loading" class="loading">Loading news from multiple countries...</div>
         <div id="error" class="error" style="display: none;"></div>
         <div id="news-container" class="news-grid"></div>
     </main>
