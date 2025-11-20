@@ -7,10 +7,13 @@ const loadingElement = document.getElementById('loading');
 const errorElement = document.getElementById('error');
 const countryFilter = document.getElementById('country-filter');
 const lastUpdated = document.getElementById('last-updated');
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
 
 let allArticles = [];
 let currentCountry = 'all';
 let showingFavorites = false;
+let currentSearchQuery = '';
 let favorites = JSON.parse(localStorage.getItem('starcope_favorites') || '[]');
 let likes = JSON.parse(localStorage.getItem('starcope_likes') || '{}');
 
@@ -114,6 +117,43 @@ async function fetchNewsFromAllCountries() {
         loadingElement.style.display = 'none';
         showError('Failed to fetch news. Please try again later.');
         console.error('Error fetching news:', error);
+    }
+}
+
+async function searchNews(query) {
+    try {
+        loadingElement.style.display = 'block';
+        errorElement.style.display = 'none';
+        currentSearchQuery = query;
+        
+        const response = await fetch(`${BASE_API_URL}?apikey=${API_KEY}&q=${encodeURIComponent(query)}&language=en`);
+        const data = await response.json();
+        
+        if (data.results && data.results.length > 0) {
+            allArticles = data.results.map(article => ({
+                ...article,
+                fetchedCountry: 'search'
+            }));
+            
+            allArticles.sort((a, b) => {
+                const dateA = new Date(a.pubDate || 0);
+                const dateB = new Date(b.pubDate || 0);
+                return dateB - dateA;
+            });
+            
+            loadingElement.style.display = 'none';
+            updateLastUpdatedTime();
+            displayNews(allArticles);
+        } else {
+            loadingElement.style.display = 'none';
+            showError(`No news found for "${query}". Try a different search term.`);
+            newsContainer.innerHTML = '';
+        }
+        
+    } catch (error) {
+        loadingElement.style.display = 'none';
+        showError('Failed to search news. Please try again later.');
+        console.error('Error searching news:', error);
     }
 }
 
@@ -239,9 +279,31 @@ function updateLastUpdatedTime() {
 countryFilter.addEventListener('change', (e) => {
     currentCountry = e.target.value;
     showingFavorites = false;
+    currentSearchQuery = '';
     document.getElementById('show-favorites').innerHTML = `<i class="fas fa-star"></i> Show Favorites (<span id="favorites-count">${favorites.length}</span>)`;
     displayNews(filterArticlesByCountry(currentCountry));
 });
+
+// Search functionality
+if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (query) {
+            searchNews(query);
+        }
+    });
+}
+
+if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchNews(query);
+            }
+        }
+    });
+}
 
 // Initial fetch
 fetchNewsFromAllCountries();
